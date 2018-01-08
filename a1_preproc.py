@@ -2,10 +2,12 @@ import sys
 import argparse
 import os
 import json
+import HTMLParser
+import re
 
 indir = '/u/cs401/A1/data/';
 
-def preproc1( comment , steps=range(1,11)):
+def preproc1( comment , steps=range(1,11) ):
     ''' This function pre-processes a single comment
 
     Parameters:                                                                      
@@ -18,11 +20,13 @@ def preproc1( comment , steps=range(1,11)):
 
     modComm = ''
     if 1 in steps:
-        print('TODO')
+        comment = comment.replace('\n', '')
     if 2 in steps:
-        print('TODO')
+        remove_html_escape = HTMLParser.HTMLParser()
+        comment = remote_html_escape.unescape(comment)
     if 3 in steps:
-        print('TODO')
+        comment = re.sub(r'http\S*', '', comment)
+        comment = re.sub(r'www\S*', '', comment)
     if 4 in steps:
         print('TODO')
     if 5 in steps:
@@ -68,8 +72,8 @@ def main( args ):
                 pre_processed_data = preproc1(j['body'])
                 j['body'] = pre_processed_data
                 j['cat'] = file
-                allOutput.append(j);
-                      
+                allOutput.append(j)
+                   
     fout = open(args.output, 'w')
     fout.write(json.dumps(allOutput))
     fout.close()
@@ -86,5 +90,5 @@ if __name__ == "__main__":
     if (args.max > 200272):
         print "Error: If you want to read more than 200,272 comments per file, you have to read them all."
         sys.exit(1)
-        
+                
     main(args)
