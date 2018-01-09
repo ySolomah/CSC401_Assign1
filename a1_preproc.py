@@ -6,15 +6,10 @@ import html
 from html.parser import HTMLParser
 import re
 import spacy
+import string
 
 indir = '/u/cs401/A1/data/';
 
-def part_four_helper( matchobj ):
-    return(matchobj.string.replace(" ", ""))
-
-def part_five_helper( matchobj ):
-    match_string = matchobj.string
-    return(match_string[0] + " " + match_string[1] + match_string[2])
 
 def preproc1( comment , steps=range(1,11) ):
     ''' This function pre-processes a single comment
@@ -34,18 +29,22 @@ def preproc1( comment , steps=range(1,11) ):
         print("Comment after 1: " + comment)
     if 2 in steps:
         remove_html_escape = HTMLParser()
-        comment = remote_html_escape.unescape(comment)
+        comment = remove_html_escape.unescape(comment)
         print("Comment after 2: " + comment)
     if 3 in steps:
         comment = re.sub(r'http\S*', '', comment)
         comment = re.sub(r'www\S*', '', comment)
         print("Comment after 3: " + comment)
     if 4 in steps:
-        comment = re.sub(r'[' + re.escape(string.punctuation) + r']+', r' \1 ', comment)
-        comment = re.sub(r'[a-zA-Z] . [a-zA-Z . ]+', part_four_helper, comment) 
-        print("Comment after 4: " + comment)
+        punct = string.punctuation
+        punct = punct.replace("'", "")
+        comment = re.sub(r'([' + re.escape(punct) + r']+)', r' \1 ', comment)
+        print("Comment after 4.1: " + comment)
+        comment = re.sub(r'([a-zA-Z] . [a-zA-Z . ]+)', r'\1'.replace(" ", ""), comment) 
+        print("Comment after 4.2: " + comment)
     if 5 in steps:
-        comment = re.sub(r"[A-Za-z]{2}[']{1}", part_fiver_helper, comment)
+        comment = re.sub(r"([A-Za-z]{1}[']{1}[A-Za-z]{1})", r' \1', comment)
+        comment = re.sub(r"([A-Za-z]{1}['] ])", r'\1'.replace("'", "") + " " + "'", comment)
         print("Comment after 5: " + comment)
     if 6 in steps:
         print('TODO')
