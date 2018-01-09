@@ -2,10 +2,19 @@ import sys
 import argparse
 import os
 import json
-import HTMLParser
+import html
+from html.parser import HTMLParser
 import re
+import spacy
 
 indir = '/u/cs401/A1/data/';
+
+def part_four_helper( matchobj ):
+    return(matchobj.string.replace(" ", ""))
+
+def part_five_helper( matchobj ):
+    match_string = matchobj.string
+    return(match_string[0] + " " + match_string[1] + match_string[2])
 
 def preproc1( comment , steps=range(1,11) ):
     ''' This function pre-processes a single comment
@@ -19,20 +28,31 @@ def preproc1( comment , steps=range(1,11) ):
     '''
 
     modComm = ''
+    print("Comment before: " + comment)
     if 1 in steps:
         comment = comment.replace('\n', '')
+        print("Comment after 1: " + comment)
     if 2 in steps:
-        remove_html_escape = HTMLParser.HTMLParser()
+        remove_html_escape = HTMLParser()
         comment = remote_html_escape.unescape(comment)
+        print("Comment after 2: " + comment)
     if 3 in steps:
         comment = re.sub(r'http\S*', '', comment)
         comment = re.sub(r'www\S*', '', comment)
+        print("Comment after 3: " + comment)
     if 4 in steps:
-        print('TODO')
+        comment = re.sub(r'[' + re.escape(string.punctuation) + r']+', r' \1 ', comment)
+        comment = re.sub(r'[a-zA-Z] . [a-zA-Z . ]+', part_four_helper, comment) 
+        print("Comment after 4: " + comment)
     if 5 in steps:
-        print('TODO')
+        comment = re.sub(r"[A-Za-z]{2}[']{1}", part_fiver_helper, comment)
+        print("Comment after 5: " + comment)
     if 6 in steps:
         print('TODO')
+        nlp = spacy.load('en', disable=['parser', 'ner'])
+        utt = nlp(u"I know the best words")
+        for token in utt:
+           print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.shape_, token.is_alpha, token.is_stop)
     if 7 in steps:
         print('TODO')
     if 8 in steps:
@@ -50,7 +70,7 @@ def main( args ):
     for subdir, dirs, files in os.walk(indir):
         for file in files:
             fullFile = os.path.join(subdir, file)
-            print "Processing " + fullFile
+            print("Processing " + fullFile)
 
             data = json.load(open(fullFile))
 
@@ -62,7 +82,7 @@ def main( args ):
             # TODO: replace the 'body' field with the processed text
             # TODO: append the result to 'allOutput'
             
-            line_start = args.ID % len(data)
+            line_start = args.ID[0] % len(data)
 
             for i in range(line_start, line_start + args.max):
                 print("i is: " + str(i))
@@ -88,7 +108,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if (args.max > 200272):
-        print "Error: If you want to read more than 200,272 comments per file, you have to read them all."
+        print("Error: If you want to read more than 200,272 comments per file, you have to read them all.")
         sys.exit(1)
                 
     main(args)
