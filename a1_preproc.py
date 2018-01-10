@@ -21,11 +21,13 @@ def preproc1( comment , steps=range(1,11) ):
     Returns:
         modComm : string, the modified comment 
     '''
-
+    
+    comment_after_five = ""
     modComm = ''
     print("Comment before: " + comment)
     if 1 in steps:
         comment = comment.replace('\n', '')
+        comment = re.sub(r'[ ]+', " ", comment)
         print("Comment after 1: " + comment)
     if 2 in steps:
         remove_html_escape = HTMLParser()
@@ -45,17 +47,38 @@ def preproc1( comment , steps=range(1,11) ):
     if 5 in steps:
         comment = re.sub(r"([A-Za-z]{1}[']{1}[A-Za-z]{1})", r' \1', comment)
         comment = re.sub(r"([A-Za-z]{1}['] ])", r'\1'.replace("'", "") + " " + "'", comment)
+        comment = re.sub(r'[ ]+', " ", comment)
+        comment_after_five = comment
         print("Comment after 5: " + comment)
     if 6 in steps:
         print('TODO')
+        new_comment_temp = ""
         nlp = spacy.load('en', disable=['parser', 'ner'])
-        utt = nlp(u"I know the best words")
+        utt = nlp(u"" + comment + "")
         for token in utt:
-           print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.shape_, token.is_alpha, token.is_stop)
+            new_comment_temp = new_comment_temp + token.text + "/" + token.tag_ + " "
+        comment = new_comment_temp
+        print("Comment after 6: " + comment)
     if 7 in steps:
-        print('TODO')
+        comment = " " + comment + " "
+        stopwords = open("/u/cs401/Wordlists/StopWords", "r")
+        for line in stopwords:
+            linesplit = line.split(" ")
+            for stopword in linesplit:
+                stopword = stopword.replace('\n', '')
+                #print("stopword: " + "'" + stopword + "'")
+                comment = re.sub(r' ' + re.escape(stopword) + r'[/]\S+ ', ' ', comment, flags=re.IGNORECASE)
+        print("Comment after 7: " + comment)
     if 8 in steps:
-        print('TODO')
+        nlp = spacy.load('en', disable=['parser', 'ner'])
+        utt = nlp(u"" + comment_after_five + "")
+        for token in utt:
+            if(token.lemma_[0] == '-' and token.text[0] != '-'):
+                continue
+            else:
+                comment = re.sub(r'' + re.escape(token.text) + r'', token.lemma_, comment)
+        print("Comment after 8: " + comment)
+        sys.exit(0)
     if 9 in steps:
         print('TODO')
     if 10 in steps:
