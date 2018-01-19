@@ -95,7 +95,7 @@ def match_helper( comment, regex_list ):
         count += len(matches)
     return (count)
 
-def extract1( comment ):
+def extract1( comment, type_comment, id_comment ):
     ''' This function extracts features from a single comment
 
     Parameters:
@@ -241,7 +241,11 @@ def extract1( comment ):
         feats[27] = (ASum/toksFound)**(1/2)
         feats[28] = (DSum/toksFound)**(1/2)
 
-
+    # id_comment, type_comment
+    with open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r') as LIWC_ID_File:
+        for i, line in enumerate(LIWC_ID_File.readlines()):
+            line = line.strip()
+            if(line == type_ID)    
 
 
 def main( args ):
@@ -255,7 +259,7 @@ def main( args ):
         comment = j['body']
         type_comment = j['cat']
 
-        feats[i, 0:172] = extract1(comment)
+        feats[i, 0:172] = extract1(comment, type_comment, j['id'])
 
         if(type_comment == "Left"):
             feats[i][173] = 0
