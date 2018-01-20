@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
+from sklearn.svm import SVC
 import numpy as np
 import argparse
 import sys
@@ -33,6 +34,43 @@ def class31(filename):
        i: int, the index of the supposed best classifier
     '''
     print('TODO Section 3.1')
+
+
+    # Classifiers SVC
+
+    data_array = np.load(filename)
+    #data_array = np.reshape(data_array, (40000, -1))
+
+    print("Shape of data array: " + str(data_array.shape))
+
+    np.random.shuffle(data_array)
+
+    print(data_array[0].astype(int))
+    print(data_array[1].astype(int))
+    print(data_array[2].astype(int))
+    print(data_array[12000].astype(int))
+    print(data_array[22000].astype(int))
+    print(data_array[32000].astype(int))
+
+    X = data_array[0:100, 0:173]
+    y = data_array[0:100, 173]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42)
+
+    clf = SVC()
+    clf.fit(X_train, y_train)
+
+    confusion_1 = np.zeros((4, 4))
+
+    for i, x_test in enumerate(X_test):
+        pred_class = clf.predict(x_test)
+        confusion_1[round(pred_class[0], 1), y_test[i]] += 1
+
+    print(confusion_1)
+
+
+    iBest = ''
 
     return (X_train, X_test, y_train, y_test,iBest)
 
@@ -79,7 +117,22 @@ def class34( filename, i ):
     print('TODO Section 3.4')
     
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="the input npz file from Task 2", required=True)
     args = parser.parse_args()
 
+
+
     # TODO : complete each classification experiment, in sequence.
+    
+    class31(args.input)
+    
+
+
+
+
+
+
+
+
+

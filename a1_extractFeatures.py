@@ -94,35 +94,38 @@ AoA_words = {}
 IMG_words = {}
 FAM_words = {}
 with open('/u/cs401/Wordlists/BristolNorms+GilhoolyLogie.csv', 'r') as csvfile:
-    for line in csvfile.readlines():
+    for n, line in enumerate(csvfile.readlines()):
         line_content = line.split(",")
-        try:
-            AoA_val = int(line_content[3])
-            IMG_val = int(line_content[4])
-            FAM_val = int(line_content[5])
+        if(n != 0 and line_content[0] != ''):
+            AoA_val = float(line_content[3])
+            IMG_val = float(line_content[4])
+            FAM_val = float(line_content[5])
             AoA_words[line_content[1]] = AoA_val
             IMG_words[line_content[1]] = IMG_val
             FAM_words[line_content[1]] = FAM_val
-        except ValueError:
-            continue
 
 V_words = {}
 A_words = {}
 D_words = {}
+count = 0
 with open('/u/cs401/Wordlists/Ratings_Warriner_et_al.csv', 'r') as csvfile:
-     for line in csvfile.readlines():
+     for n, line in enumerate(csvfile.readlines()):
         line_content = line.split(",")
-        try:
-            V_val = int(line_content[2])
-            A_val = int(line_content[5])
-            D_val = int(line_content[8])
+        if(n != 0 and line_content[0] != ''):
+            V_val = float(line_content[2])
+            A_val = float(line_content[5])
+            D_val = float(line_content[8])
             V_words[line_content[1]] = V_val
             A_words[line_content[1]] = A_val
             D_words[line_content[1]] = D_val
-        except ValueError:
-            continue
 
-   
+print("AoA")
+print(AoA_words)
+print("V")
+print(V_words)
+#sys.exit() 
+
+map_comment = {}
 
 def match_helper( comment, regex_list ):
     count = 0
@@ -140,6 +143,8 @@ def extract1( comment, type_comment, id_comment ):
     Returns:
         feats : numpy Array, a 173-length vector of floating point features
     '''
+
+    global map_comment
 
     comment = " " + comment + " "
 
@@ -297,14 +302,25 @@ def extract1( comment, type_comment, id_comment ):
 
     j = -1
     # id_comment, type_comment
-    for i, line in enumerate(LIWC_ID_File.readlines()):
-        line = line.strip()
-        if(id_comment in line): 
-            j = i
-            break
+    #for i, line in enumerate(LIWC_ID_File.readlines()):
+    #    print(id_comment)
+    #    if(id_comment in line): 
+    #        print("Found comment: " + id_comment)
+    #        j = i
+    #        break
+    try:
+        j = map_comment[id_comment]
+        print("Found id: " + id_comment + " at index: " + str(j))
+    except:
+        print("Failed to find id: " + id_comment)
 
     if(j != -1): # LIWC_array
+        print("Extracting...")
+        print(LIWC_array)
         feats[29:173] = LIWC_array[j*144:((j+1)*144)]
+        print(feats[29:173])
+
+    print(feats)
 
     return(feats)
         
@@ -314,6 +330,7 @@ def main( args ):
 
     global LIWC_ID_File
     global LIWC_array
+    global map_comment
 
     data = json.load(open(args.input))
     feats = np.zeros( (len(data), 173+1))
@@ -332,6 +349,8 @@ def main( args ):
     map_type["Right"] = 2
     map_type["Alt"] = 3
 
+    map_comment = {}
+    
     # TODO: your co
     for i in range(len(data)):
         print("Processing: " + str(i))
@@ -341,11 +360,19 @@ def main( args ):
 
         if(type_comment != last_type):
             last_type = type_comment
+            map_comment = {}
             LIWC_ID_File = open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r')
             LIWC_array = np.fromfile('/u/cs401/A1/feats/' + type_comment + '_feats.dat.npy')
+            print(LIWC_array)
+            print(LIWC_array.shape)
+            for m, line in enumerate(LIWC_ID_File.readlines()):
+                map_comment[line.strip("\n").strip("'").strip(" ")] = m
+            #print(LIWC_ID_File.readlines())
+            #sys.exit()
     
         feats[i, 0:173] = extract1(comment, type_comment, j['id'])
         feats[i][173] = map_type[type_comment]
+        print("Map: " + str(feats[i][173]))
         '''
         if(type_comment == "Left"):
             feats[i][173] = 0
@@ -360,8 +387,9 @@ def main( args ):
             sys.exit(-1)
         '''
 
+    print("Shape of feats: " + str(feats.shape))
 
-    np.savez_compressed( args.output, feats)
+    np.save(args.output, feats)
 
     
 if __name__ == "__main__": 
