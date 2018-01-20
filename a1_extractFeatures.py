@@ -5,6 +5,7 @@ import os
 import json
 import re
 import csv
+import string
 
 first_person = open("/u/cs401/Wordlists/First-person", "r")
 second_person = open("/u/cs401/Wordlists/Second-person", "r")
@@ -12,47 +13,77 @@ third_person = open("/u/cs401/Wordlists/Third-person", "r")
 coord_conj = open("/u/cs401/Wordlists/Conjunct", "r")
 slang_one = open("/u/cs401/Wordlists/Slang", "r")
 slang_two = open("/u/cs401/Wordlists/Slang2", "r")
+LIWC_ID_File = ''
+LIWC_array = ''
 
 
+first_person_string = "("
 first_person_words = []
 for line in first_person:
     linesplit = line.split(" ")
     for word in linesplit:
         word = word.replace('\n', '')
         first_person_words.append(word)
+        first_person_string = first_person_string + word + "|"
+first_person_string = first_person_string.strip("|") + ")"
+first_person_string = re.compile(' ' + first_person_string + "/", flags=re.IGNORECASE)
 
+
+second_person_string = "("
 second_person_words = []
 for line in second_person:
     linesplit = line.split(" ")
     for word in linesplit:
         word = word.replace('\n', '')
         second_person_words.append(word)
+        second_person_string = second_person_string + word + "|"
+second_person_string = second_person_string.strip("|") + ")"
+second_person_string = re.compile(' ' + second_person_string + "/", flags=re.IGNORECASE)
 
+
+third_person_string = "("
 third_person_words = []
 for line in third_person:
     linesplit = line.split(" ")
     for word in linesplit:
         word = word.replace('\n', '')
         third_person_words.append(word)
+        third_person_string = third_person_string + word + "|"
+third_person_string = third_person_string.strip("|") + ")"
+third_person_string = re.compile(' ' + third_person_string + "/", flags=re.IGNORECASE)
 
+
+conj_string = "("
 conj_words = []
 for line in coord_conj:
     linesplit = line.split(" ")
     for word in linesplit:
         word = word.replace('\n', '')
         conj_words.append(word)
+        conj_string = conj_string + word + "|"
+conj_string = conj_string.strip("|") + ")"
+conj_string = re.compile(' ' + conj_string + "/", flags=re.IGNORECASE)
 
+
+slang_string = "("
 slang_words = []
 for line in slang_one:
     linesplit = line.split(" ")
     for word in linesplit:
         word = word.replace('\n', '')
         slang_words.append(word)
+        slang_string = slang_string + word + "|"
+
+
 for line in slang_two:
     linesplit = line.split(" ")
     for word in linesplit:
         word = word.replace('\n', '')
         slang_words.append(word)
+        slang_string = slang_string + word + "|"
+slang_string = slang_string.strip("|") + ")"
+slang_string = re.compile(' ' + slang_string + "/", flags=re.IGNORECASE)
+
 
 future_tense_tags = ["'ll", "will"]
 common_noun_tags = ["NN", "NNS"]
@@ -66,9 +97,12 @@ with open('/u/cs401/Wordlists/BristolNorms+GilhoolyLogie.csv', 'r') as csvfile:
     for line in csvfile.readlines():
         line_content = line.split(",")
         try:
-            AoA_words[line_content[1]] = int(line_content[3])
-            IMG_words[line_content[1]] = int(line_content[4])
-            FAM_words[line_content[1]] = int(line_content[5])
+            AoA_val = int(line_content[3])
+            IMG_val = int(line_content[4])
+            FAM_val = int(line_content[5])
+            AoA_words[line_content[1]] = AoA_val
+            IMG_words[line_content[1]] = IMG_val
+            FAM_words[line_content[1]] = FAM_val
         except ValueError:
             continue
 
@@ -79,15 +113,16 @@ with open('/u/cs401/Wordlists/Ratings_Warriner_et_al.csv', 'r') as csvfile:
      for line in csvfile.readlines():
         line_content = line.split(",")
         try:
-            V_words[line_content[1]] = int(line_content[2])
-            A_words[line_content[1]] = int(line_content[5])
-            D_words[line_content[1]] = int(line_content[8])
+            V_val = int(line_content[2])
+            A_val = int(line_content[5])
+            D_val = int(line_content[8])
+            V_words[line_content[1]] = V_val
+            A_words[line_content[1]] = A_val
+            D_words[line_content[1]] = D_val
         except ValueError:
             continue
 
    
-
-LIWC_ID_File = open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r')
 
 def match_helper( comment, regex_list ):
     count = 0
@@ -105,25 +140,34 @@ def extract1( comment, type_comment, id_comment ):
     Returns:
         feats : numpy Array, a 173-length vector of floating point features
     '''
-    print('TODO')
+
+    comment = " " + comment + " "
+
+    #print('TODO')
     string_array = []
     # TODO: your code here
     feats = np.zeros(173)
 
+    #return(feats)
+
     # 1) FIRST PERSON
-    feats[0] = match_helper(comment, first_person_words)
+    feats[0] = len(re.findall(first_person_string, comment))
 
     # 2) SECOND PERSON
-    feats[1] = match_helper(comment, second_person_words)
+    feats[1] = len(re.findall(second_person_string, comment))
 
     # 3) THIRD PERSON
-    feats[2] = match_helper(comment, third_person_words)
+    feats[2] = len(re.findall(third_person_string, comment))
+
+    #return(feats)
 
     # 4) CONJ
-    feats[3] = match_helper(comment, conj_words)
+    feats[3] = len(re.findall(conj_string, comment))
 
     # 5) TAG PAST TENSE
     feats[4] = len(re.findall("/vdb", comment, flags=re.IGNORECASE))
+
+    #return(feats)
 
     # 6) TAG FUTURE TENSE
     feats[5] = match_helper(comment, future_tense_tags)
@@ -143,6 +187,8 @@ def extract1( comment, type_comment, id_comment ):
     for proper_noun in proper_noun_tags:
         feats[9] += len(re.findall(r'[/' + proper_noun + r' ]{1}', comment, flags=re.IGNORECASE))
 
+    #return(feats)
+
     # 11) ADVERBS
     for adverb in adverb_tags:
         feats[10] += len(re.findall(r'[/' + adverb + r" ]{1}", comment, flags=re.IGNORECASE))
@@ -151,8 +197,7 @@ def extract1( comment, type_comment, id_comment ):
     feats[11] = len(re.findall(r'[ wh\S+]{1}', comment, flags=re.IGNORECASE))
 
     # 13) slang ACRO
-    for slang in slang_words:
-        feats[12] += len(re.findall(r' ' + re.escape(slang) + r'', comment, flags = re.IGNORECASE))
+    feats[12] = len(re.findall(slang_string, comment))
 
     # 14) UPPERCASE
     feats[13] = len(re.findall(r' [A-Z]{3,}[/]{1}', comment))
@@ -161,7 +206,8 @@ def extract1( comment, type_comment, id_comment ):
     feats[16] = len(re.findall(r'' + re.escape("\n") + r'', comment))
 
     # 15) LENGTH
-    feats[14] = len(re.findall(r'\S+/\S+', comment)) / feats[16]
+    if(feats[16] > 0):
+        feats[14] = len(re.findall(r'\S+/\S+', comment)) / feats[16]
 
     # 16) LENGTH (NOT PUNCT)
     toks = re.findall(r'( \w+/)', comment)
@@ -169,7 +215,12 @@ def extract1( comment, type_comment, id_comment ):
     total_length = 0
     for tok in toks:
         total_length += len(tok) - 1
-    feats[15] = total_length / num_toks
+    if(num_toks > 0):
+        feats[15] = total_length / num_toks
+    #else:
+    #    print("No tokens? " + comment)
+
+    #return(feats)
 
     # 18, 19, 20) AVERAGE OF AoA, IMG, FAM
     toksFound = 0
@@ -214,7 +265,7 @@ def extract1( comment, type_comment, id_comment ):
     DSum = 0
     for tok in toks:
         tok = tok.rstrip("/").lstrip(" ")
-        if(tok in AoA_words):
+        if(tok in V_words):
             toksFound += 1
             VSum += V_words[tok]
             ASum += A_words[tok]
@@ -232,7 +283,7 @@ def extract1( comment, type_comment, id_comment ):
     DSum = 0
     for tok in toks:
         tok = tok.rstrip("/").lstrip(" ")
-        if(tok in AoA_words):
+        if(tok in V_words):
             toksFound += 1
             VSum += (V_words[tok] - feats[23])**2
             ASum += (A_words[tok] - feats[24])**2
@@ -242,25 +293,60 @@ def extract1( comment, type_comment, id_comment ):
         feats[27] = (ASum/toksFound)**(1/2)
         feats[28] = (DSum/toksFound)**(1/2)
 
+    #return(feats)
+
+    j = -1
     # id_comment, type_comment
-        for i, line in enumerate(LIWC_ID_File.readlines()):
-            line = line.strip()
-            if(line == type_ID): 
+    for i, line in enumerate(LIWC_ID_File.readlines()):
+        line = line.strip()
+        if(id_comment in line): 
+            j = i
+            break
+
+    if(j != -1): # LIWC_array
+        feats[29:173] = LIWC_array[j*144:((j+1)*144)]
+
+    return(feats)
+        
 
 
 def main( args ):
 
+    global LIWC_ID_File
+    global LIWC_array
+
     data = json.load(open(args.input))
     feats = np.zeros( (len(data), 173+1))
 
+    print("shape of feats " + str(feats.shape))
+
+    #LIWC_ID_File = open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r')
+    #LIWC_array = np.fromfile('/u/cs401/A1/feats/' + type_comment + '_feats.dat.npy')
+
+
+    last_type = "-"
+
+    map_type = {}
+    map_type["Left"] = 0
+    map_type["Center"] = 1
+    map_type["Right"] = 2
+    map_type["Alt"] = 3
+
     # TODO: your co
-    for i, line in enumerate(data):
-        j = json.loads(line)
+    for i in range(len(data)):
+        print("Processing: " + str(i))
+        j = data[i]
         comment = j['body']
         type_comment = j['cat']
 
-        feats[i, 0:172] = extract1(comment, type_comment, j['id'])
-
+        if(type_comment != last_type):
+            last_type = type_comment
+            LIWC_ID_File = open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r')
+            LIWC_array = np.fromfile('/u/cs401/A1/feats/' + type_comment + '_feats.dat.npy')
+    
+        feats[i, 0:173] = extract1(comment, type_comment, j['id'])
+        feats[i][173] = map_type[type_comment]
+        '''
         if(type_comment == "Left"):
             feats[i][173] = 0
         elif(type_comment == "Center"):
@@ -272,7 +358,7 @@ def main( args ):
         else:
             print("Unknown type: " + type_comment)
             sys.exit(-1)
-
+        '''
 
 
     np.savez_compressed( args.output, feats)
