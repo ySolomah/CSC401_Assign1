@@ -87,6 +87,7 @@ with open('/u/cs401/Wordlists/Ratings_Warriner_et_al.csv', 'r') as csvfile:
 
    
 
+LIWC_ID_File = open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r')
 
 def match_helper( comment, regex_list ):
     count = 0
@@ -242,10 +243,9 @@ def extract1( comment, type_comment, id_comment ):
         feats[28] = (DSum/toksFound)**(1/2)
 
     # id_comment, type_comment
-    with open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r') as LIWC_ID_File:
         for i, line in enumerate(LIWC_ID_File.readlines()):
             line = line.strip()
-            if(line == type_ID)    
+            if(line == type_ID): 
 
 
 def main( args ):

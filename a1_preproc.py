@@ -12,7 +12,23 @@ indir = '/u/cs401/A1/data/';
 
 stopwords = open("/u/cs401/Wordlists/StopWords", "r")
 common_abbrev = open("/u/cs401/Wordlists/abbrev.english", "r")
+punct = string.punctuation
+punct = punct.replace("'", "")
+nlp = spacy.load('en', disable=['parser', 'ner'])
+linesplit = []
+total_line_split = "("
+for line in stopwords:
+    linesplit_temp = line.split(" ")
+    for stopword in linesplit_temp:
+        stopword = stopword.replace('\n', '')
+        total_line_split = total_line_split + stopword + "|"
 
+total_line_split = total_line_split.strip("|") + ")"
+
+print("total_line_split: " + total_line_split);
+
+total_line_split = re.compile(' ' + total_line_split + '/\S+ ', flags=re.IGNORECASE)
+ 
 def preproc1( comment , steps=range(1,11) ):
     ''' This function pre-processes a single comment
 
@@ -23,6 +39,8 @@ def preproc1( comment , steps=range(1,11) ):
     Returns:
         modComm : string, the modified comment 
     '''
+    global nlp
+    global total_line_split
     
     comment_after_five = ""
     modComm = ''
@@ -40,12 +58,9 @@ def preproc1( comment , steps=range(1,11) ):
         comment = re.sub(r'www\S*', '', comment)
 #        print("Comment after 3: " + comment)
     if 4 in steps:
-        punct = string.punctuation
-        punct = punct.replace("'", "")
         comment = re.sub(r'([' + re.escape(punct) + r']+)', r' \1 ', comment)
-#        print("Comment after 4.1: " + comment)
         comment = re.sub(r'([a-zA-Z] . [a-zA-Z . ]+)', r'\1'.replace(" ", ""), comment) 
-#        print("Comment after 4.2: " + comment)
+#        print("Comment after 4: " + comment)
     if 5 in steps:
         comment = re.sub(r"([A-Za-z]{1}[']{1}[A-Za-z]{1})", r' \1', comment)
         comment = re.sub(r"([A-Za-z]{1}['] ])", r'\1'.replace("'", "") + " " + "'", comment)
@@ -54,7 +69,6 @@ def preproc1( comment , steps=range(1,11) ):
 #        print("Comment after 5: " + comment)
     if 6 in steps:
         new_comment_temp = ""
-        nlp = spacy.load('en', disable=['parser', 'ner'])
         utt = nlp(u"" + comment + "")
         for token in utt:
             new_comment_temp = new_comment_temp + token.text + "/" + token.tag_ + " "
@@ -62,20 +76,18 @@ def preproc1( comment , steps=range(1,11) ):
 #        print("Comment after 6: " + comment)
     if 7 in steps:
         comment = " " + comment + " "
-        for line in stopwords:
-            linesplit = line.split(" ")
-            for stopword in linesplit:
-                stopword = stopword.replace('\n', '')
-                comment = re.sub(r' ' + re.escape(stopword) + r'[/]\S+ ', ' ', comment, flags=re.IGNORECASE)
+        comment = re.sub(total_line_split, ' ', comment)
 #        print("Comment after 7: " + comment)
     if 8 in steps:
-        nlp = spacy.load('en', disable=['parser', 'ner'])
         utt = nlp(u"" + comment_after_five + "")
         for token in utt:
             if(token.lemma_[0] == '-' and token.text[0] != '-'):
                 continue
             else:
-                comment = re.sub(r'' + re.escape(token.text) + r'', token.lemma_, comment)
+                try:
+                    comment = re.sub(r'' + re.escape(token.text) + r'', token.lemma_, comment)
+                except:
+                    pass
 #        print("Comment after 8: " + comment)
     if 9 in steps:
         split_comment = comment.split(" ")
@@ -105,7 +117,6 @@ def preproc1( comment , steps=range(1,11) ):
                 new_comment = new_comment + split_comment[i] + " "
         comment = new_comment
 #        print("Comment after 9: " + comment)
-
     if 10 in steps:
         comment = comment.lower()
 #        print("Comment after 10: " + comment)
@@ -138,7 +149,7 @@ def main( args ):
                 line = data[i]
                 j = json.loads(line)
  #               print("j is: " + str(j))
-                pre_processed_data = preproc1(j['body'])
+                pre_processed_data = preproc1(j['body'], steps=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
                 j['body'] = pre_processed_data
                 j['cat'] = file
                 allOutput.append(j)
