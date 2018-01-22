@@ -6,6 +6,7 @@ import json
 import re
 import csv
 import string
+import math
 
 first_person = open("/u/cs401/Wordlists/First-person", "r")
 second_person = open("/u/cs401/Wordlists/Second-person", "r")
@@ -244,6 +245,9 @@ def extract1( comment, type_comment, id_comment ):
         feats[18] = IMGSum/toksFound
         feats[19] = FAMSum/toksFound
 
+    print("feats[17]: " + str(feats[17]));
+    print("feats[18]: " + str(feats[18]));
+    print("feats[19]: " + str(feats[19]));
 
     # 21, 22, 23) STD DEV OF AoA, IMG, FAM
     toksFound = 0
@@ -258,9 +262,14 @@ def extract1( comment, type_comment, id_comment ):
             IMGSum += (IMG_words[tok] - feats[18])**2
             FAMSum += (FAM_words[tok] - feats[19])**2
     if(toksFound > 0):
-        feats[20] = (AoASum/toksFound)**(1/2)
-        feats[21] = (IMGSum/toksFound)**(1/2)
-        feats[22] = (FAMSum/toksFound)**(1/2)
+        feats[20] = (AoASum/toksFound)**(0.5)
+        feats[21] = (IMGSum/toksFound)**(0.5)
+        feats[22] = (FAMSum/toksFound)**(0.5)
+
+
+    #print("feats[20]: " + str(feats[20]));
+    #print("feats[21]: " + str(feats[21]));
+    #print("feats[22]: " + str(feats[22]));
 
 
     # 24, 25, 26) AVERAGE of V, A, D
@@ -281,6 +290,11 @@ def extract1( comment, type_comment, id_comment ):
         feats[25] = DSum/toksFound
 
 
+
+    #print("feats[23]: " + str(feats[23]));
+    #print("feats[24]: " + str(feats[24]));
+    #print("feats[25]: " + str(feats[25]));
+
     # 27, 28, 29) STD DEV OF V, A, D
     toksFound = 0
     VSum = 0
@@ -290,13 +304,21 @@ def extract1( comment, type_comment, id_comment ):
         tok = tok.rstrip("/").lstrip(" ")
         if(tok in V_words):
             toksFound += 1
-            VSum += (V_words[tok] - feats[23])**2
+            VSum += math.pow(V_words[tok] - feats[23], 2)
             ASum += (A_words[tok] - feats[24])**2
             DSum += (D_words[tok] - feats[25])**2
     if(toksFound > 0):
-        feats[26] = (VSum/toksFound)**(1/2)
-        feats[27] = (ASum/toksFound)**(1/2)
-        feats[28] = (DSum/toksFound)**(1/2)
+        feats[26] = float((float(VSum)/float(toksFound)))
+        feats[26] = math.pow(feats[26], 0.5)
+        feats[27] = (ASum/toksFound)
+        feats[27] = math.pow(feats[27], 0.5)
+        feats[28] = (DSum/toksFound)
+        feats[28] = math.pow(feats[28], 0.5)
+
+
+    #print("feats[26]: " + str(feats[26]));
+    #print("feats[27]: " + str(feats[27]));
+    #print("feats[28]: " + str(feats[28]));
 
     #return(feats)
 
@@ -315,12 +337,12 @@ def extract1( comment, type_comment, id_comment ):
         print("Failed to find id: " + id_comment)
 
     if(j != -1): # LIWC_array
-        print("Extracting...")
-        print(LIWC_array)
+        #print("Extracting...")
+        #print(LIWC_array)
         feats[29:173] = LIWC_array[j*144:((j+1)*144)]
-        print(feats[29:173])
+        #print(feats[29:173])
 
-    print(feats)
+    #print(feats)
 
     return(feats)
         
@@ -363,8 +385,8 @@ def main( args ):
             map_comment = {}
             LIWC_ID_File = open('/u/cs401/A1/feats/' + type_comment + '_IDs.txt', 'r')
             LIWC_array = np.fromfile('/u/cs401/A1/feats/' + type_comment + '_feats.dat.npy')
-            print(LIWC_array)
-            print(LIWC_array.shape)
+            #print(LIWC_array)
+            #print(LIWC_array.shape)
             for m, line in enumerate(LIWC_ID_File.readlines()):
                 map_comment[line.strip("\n").strip("'").strip(" ")] = m
             #print(LIWC_ID_File.readlines())
@@ -372,7 +394,8 @@ def main( args ):
     
         feats[i, 0:173] = extract1(comment, type_comment, j['id'])
         feats[i][173] = map_type[type_comment]
-        print("Map: " + str(feats[i][173]))
+        #print("Map: " + str(feats[i][173]))
+        #print(feats[i])
         '''
         if(type_comment == "Left"):
             feats[i][173] = 0

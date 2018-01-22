@@ -29,7 +29,7 @@ print("total_line_split: " + total_line_split);
 
 total_line_split = re.compile(' ' + total_line_split + '/\S+ ', flags=re.IGNORECASE)
  
-def preproc1( comment , steps=range(1,11) ):
+def preproc1( comment , steps=range(1,11), print_help=False ):
     ''' This function pre-processes a single comment
 
     Parameters:                                                                      
@@ -39,45 +39,68 @@ def preproc1( comment , steps=range(1,11) ):
     Returns:
         modComm : string, the modified comment 
     '''
+
     global nlp
     global total_line_split
     
     comment_after_five = ""
     modComm = ''
-#    print("Comment before: " + comment)
+    if(print_help):
+        print("Comment before: " + comment)
     if 1 in steps:
         comment = comment.replace('\n', '')
         comment = re.sub(r'[ ]+', " ", comment)
-#        print("Comment after 1: " + comment)
+        if(print_help):
+            print("Comment after 1: " + comment)
     if 2 in steps:
         remove_html_escape = HTMLParser()
         comment = remove_html_escape.unescape(comment)
-#        print("Comment after 2: " + comment)
+        if(print_help):
+            print("Comment after 2: " + comment)
     if 3 in steps:
         comment = re.sub(r'http\S*', '', comment)
-        comment = re.sub(r'www\S*', '', comment)
-#        print("Comment after 3: " + comment)
+        comment = re.sub(r'www\S*', '', comment) 
+        if(print_help):
+            print("Comment after 3: " + comment)
     if 4 in steps:
         comment = re.sub(r'([' + re.escape(punct) + r']+)', r' \1 ', comment)
-        comment = re.sub(r'([a-zA-Z] . [a-zA-Z . ]+)', r'\1'.replace(" ", ""), comment) 
-#        print("Comment after 4: " + comment)
+        comment = re.sub(r'([a-zA-Z] . [a-zA-Z . ]+)', r'\1'.replace(" ", ""), comment)
+        comment = re.sub(r'([ ]+)', r' ', comment) 
+        if(print_help):
+            print("Comment after 4: " + comment)
     if 5 in steps:
         comment = re.sub(r"([A-Za-z]{1}[']{1}[A-Za-z]{1})", r' \1', comment)
         comment = re.sub(r"([A-Za-z]{1}['] ])", r'\1'.replace("'", "") + " " + "'", comment)
-        comment = re.sub(r'[ ]+', " ", comment)
+        comment = re.sub(r'[ ]+', ' ', comment)
+        comment = comment.strip(" ")
         comment_after_five = comment
-#        print("Comment after 5: " + comment)
+        if(print_help):
+            print("Comment after 5: " + comment)
     if 6 in steps:
         new_comment_temp = ""
         utt = nlp(u"" + comment + "")
+        temp_string = ""
+        prev_tag = ""
         for token in utt:
-            new_comment_temp = new_comment_temp + token.text + "/" + token.tag_ + " "
-        comment = new_comment_temp
-#        print("Comment after 6: " + comment)
+            if(token.text in punct):
+                temp_string = temp_string + token.text
+                prev_tag = token.tag_
+            else:
+                if(temp_string != ''):
+                    new_comment_temp = new_comment_temp + temp_string + "/" + prev_tag + " "
+                    prev_tag = ''
+                    temp_string = ''
+                new_comment_temp = new_comment_temp + token.text + "/" + token.tag_ + " "
+        if(temp_string != ''):
+            new_comment_temp = new_comment_temp + temp_string + "/" + prev_tag + " "
+        comment = new_comment_temp.strip(" ")
+        if(print_help):
+            print("Comment after 6: " + comment)
     if 7 in steps:
         comment = " " + comment + " "
         comment = re.sub(total_line_split, ' ', comment)
-#        print("Comment after 7: " + comment)
+        if(print_help):
+            print("Comment after 7: " + comment)
     if 8 in steps:
         utt = nlp(u"" + comment_after_five + "")
         for token in utt:
@@ -88,7 +111,8 @@ def preproc1( comment , steps=range(1,11) ):
                     comment = re.sub(r'' + re.escape(token.text) + r'', token.lemma_, comment)
                 except:
                     pass
-#        print("Comment after 8: " + comment)
+        if(print_help):
+            print("Comment after 8: " + comment)
     if 9 in steps:
         split_comment = comment.split(" ")
         new_comment = ""
@@ -116,10 +140,12 @@ def preproc1( comment , steps=range(1,11) ):
             else:
                 new_comment = new_comment + split_comment[i] + " "
         comment = new_comment
-#        print("Comment after 9: " + comment)
+        if(print_help):
+            print("Comment after 9: " + comment)
     if 10 in steps:
         comment = comment.lower()
-#        print("Comment after 10: " + comment)
+        if(print_help):
+            print("Comment after 10: " + comment)
 
     modComm = comment
     return modComm
