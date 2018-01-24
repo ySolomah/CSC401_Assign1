@@ -11,7 +11,7 @@ import argparse
 import sys
 import os
 
-file_temp = open("temp_result.txt", 'w')
+file_temp = open("temp_result2000.txt", 'w')
 
 def print_and_write(output):
     global file_temp
@@ -95,7 +95,7 @@ def class31(filename):
 
     #X = data_array[:, 0:173]
     #y = data_array[:, 173]
-    
+    '''    
     X1 = data_array[0:100, 0:173]
     y1 = data_array[0:100, 173]
 
@@ -107,24 +107,25 @@ def class31(filename):
 
     X4 = data_array[30000:30100, 0:173]
     y4 = data_array[30000:30100, 173]
-    ''' 
-    X1 = data_array[0:10, 0:173]
-    y1 = data_array[0:10, 173]
-
-    X2 = data_array[10000:10010, 0:173]
-    y2 = data_array[10000:10010, 173]
-
-    X3 = data_array[20000:20010, 0:173]
-    y3 = data_array[20000:20010, 173]
-
-    X4 = data_array[30000:30010, 0:173]
-    y4 = data_array[30000:30010, 173]
     '''
+    
+    X1 = data_array[0:500, 0:173]
+    y1 = data_array[0:500, 173]
+
+    X2 = data_array[10000:10500, 0:173]
+    y2 = data_array[10000:10500, 173]
+
+    X3 = data_array[20000:20500, 0:173]
+    y3 = data_array[20000:20500, 173]
+
+    X4 = data_array[30000:30500, 0:173]
+    y4 = data_array[30000:30500, 173]
+    
 
 
     X = np.concatenate((X1, X2, X3, X4))
     y = np.concatenate((y1, y2, y3, y4))
-
+    
     print("Shape of X: " + str(X.shape))
 
     X_train, X_test, y_train, y_test = train_test_split(

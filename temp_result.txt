@@ -1,0 +1,75 @@
+
+
+Linear SVC
+Linear test data...
+SVC Linear confusion
+[[1382  210  179  229]
+ [ 411  707  401  467]
+ [ 298  325 1123  301]
+ [ 375  518  466  608]]
+SVC Linear accuracy
+0.4775
+SVC Linear precision
+[ 0.56042174  0.40170455  0.51775012  0.3788162 ]
+SVC Linear recall
+[ 0.691       0.35599194  0.54860772  0.30910015]
+
+
+Radial SVC
+Radial test data...
+SVC Radial confusion
+[[  65    4    4 1927]
+ [  14   15    5 1952]
+ [  14    6   17 2010]
+ [   9    6    9 1943]]
+SVC Radial accuracy
+0.255
+SVC Radial precision
+[ 0.6372549   0.48387097  0.48571429  0.24808478]
+SVC Radial recall
+[ 0.0325      0.00755287  0.00830484  0.98779868]
+
+
+RandomForestClassifier
+RFC test data...
+RFC confusion
+[[1260  168  369  203]
+ [ 393  398  711  484]
+ [ 311  203 1300  233]
+ [ 372  330  757  508]]
+RFC accuracy
+0.43325
+RFC precision
+[ 0.53938356  0.36214741  0.41440867  0.3557423 ]
+RFC recall
+[ 0.63        0.20040282  0.63507572  0.25826131]
+
+
+MLPClassifier
+MLP test data...
+MLP confusion
+[[ 684  543  696   77]
+ [ 165  742  944  135]
+ [ 100  293 1512  142]
+ [ 120  662 1009  176]]
+MLP accuracy
+0.38925
+MLP precision
+[ 0.63985033  0.33125     0.36337419  0.33207547]
+MLP recall
+[ 0.342       0.37361531  0.73864191  0.08947636]
+
+
+AdaBoostClassifier
+ABC test data...
+ABC confusion
+[[1348  233  214  205]
+ [ 310  695  518  463]
+ [ 270  311 1217  249]
+ [ 297  561  576  533]]
+ABC accuracy
+0.474125
+ABC precision
+[ 0.6058427   0.38611111  0.4819802   0.36758621]
+ABC recall
+[ 0.674       0.34994965  0.59452858  0.27097102]
