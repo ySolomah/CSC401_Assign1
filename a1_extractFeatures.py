@@ -339,6 +339,7 @@ def extract1( comment, type_comment, id_comment ):
     if(j != -1): # LIWC_array
         #print("Extracting...")
         #print(LIWC_array)
+        print(LIWC_array.shape)
         feats[29:173] = LIWC_array[j*144:((j+1)*144)]
         #print(feats[29:173])
 
