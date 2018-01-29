@@ -20,15 +20,18 @@ parser.add_argument("-i", "--input", help="the input npz file from Task 2", requ
 parser.add_argument("--csv_out", default="garb.txt")
 parser.add_argument("--result_out", default="garb.txt")
 parser.add_argument("--data_size", type=int, default=10000)
+parser.add_argument("--csv_3_1", default="a1_3.1.csv")
+parser.add_argument("--csv_3_2", default="a1_3.2.csv")
 parser.add_argument("--csv_3_3", default="a1_3.3.csv")
 parser.add_argument("--part4_out", default="part4_out.txt")
 parser.add_argument("--part4_csv", default="a1_3.4.csv")
 args = parser.parse_args()
 
 
-
 file_temp = open(args.result_out, 'w')
 csv_temp = open(args.csv_out, 'w')
+csv_3_1 = open(args.csv_3_1, 'w')
+csv_3_2 = open(args.csv_3_2, 'w')
 csv_3_3 = open(args.csv_3_3, 'w')
 part_4_file = open(args.part4_out,'w')
 part_4_csv = open(args.part4_csv, 'w')
@@ -39,22 +42,36 @@ def print_and_write(output):
     print(output)
     return
 
-def write_to_csv( classifier_type, accuracy, recall, precision, confusion ):
-    csv_temp.write(str(classifier_type) + ",")
-    csv_temp.write(str(accuracy) + ",")
+def write_to_csv_4( classifier_type, accuracy, recall, precision, confusion ):
+    part_4_csv.write(str(classifier_type) + ",")
+    part_4_csv.write(str(accuracy) + ",")
     for element in recall:
-        csv_temp.write(str(element) + ",")
+        part_4_csv.write(str(element) + ",")
     for element in precision:
-        csv_temp.write(str(element) + ",")
+        part_4_csv.write(str(element) + ",")
     for i in range(4):
         for j in range(4):
-            csv_temp.write(str(confusion[i][j]))
+            part_4_csv.write(str(confusion[i][j]))
             if(i != 3 or j != 3):
-                csv_temp.write(",")
-    csv_temp.write("\n")
+                part_4_csv.write(",")
+    part_4_csv.write("\n")
+   
+def write_to_csv( classifier_type, accuracy, recall, precision, confusion ):
+    csv_3_1.write(str(classifier_type) + ",")
+    csv_3_1.write(str(accuracy) + ",")
+    for element in recall:
+        csv_3_1.write(str(element) + ",")
+    for element in precision:
+        csv_3_1.write(str(element) + ",")
+    for i in range(4):
+        for j in range(4):
+            csv_3_1.write(str(confusion[i][j]))
+            if(i != 3 or j != 3):
+                csv_3_1.write(",")
+    csv_3_1.write("\n")
    
 def write_to_csv_part2(accuracy):
-    csv_temp.write(str(accuracy) + ",") 
+    csv_3_2.write(str(accuracy) + ",") 
 
 def print_and_write4(output):
     part_4_file.write(str(output) + "\n")
@@ -140,9 +157,10 @@ def class31(filename):
     #print(data_array[12000].astype(int))
     #print(data_array[22000].astype(int))
     #print(data_array[32000].astype(int))
-
+    
     X = data_array[:, 0:173]
     y = data_array[:, 173]
+    
     '''    
     X1 = data_array[0:100, 0:173]
     y1 = data_array[0:100, 173]
@@ -171,7 +189,8 @@ def class31(filename):
     
     best_acc = 0
     best = 0
-
+    '''
+    '''
     X = np.concatenate((X1, X2, X3, X4))
     y = np.concatenate((y1, y2, y3, y4))
     '''
@@ -597,16 +616,63 @@ def class34( filename, i ):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
 
-        X_train = X_train[0:15000]
-        y_train = y_train[0:15000]
+        #X_train = X_train[0:4000]
+        #y_train = y_train[0:4000]
 
+        data_size=25
+
+        print(X_train.shape)
+
+        X1 = X_train[0:data_size, 0:173]
+        y1 = y_train[0:data_size]
+
+        X2 = X_train[8000:8000+data_size, 0:173]
+        y2 = y_train[8000:8000+data_size]
+
+        X3 = X_train[16000:16000+data_size, 0:173]
+        y3 = y_train[16000:16000+data_size]
+
+        X4 = X_train[24000:24000+data_size, 0:173]
+        y4 = y_train[24000:24000+data_size]
+        
+
+        X_train = np.concatenate((X1, X2, X3, X4))
+        y_train = np.concatenate((y1, y2, y3, y4))
+
+
+
+        data_size = 200
+
+        X1 = X_test[0:data_size, 0:173]
+        y1 = y_test[0:data_size]
+
+        X2 = X_test[2000:2000+data_size, 0:173]
+        y2 = y_test[2000:2000+data_size]
+
+        X3 = X_test[4000:4000+data_size, 0:173]
+        y3 = y_test[4000:4000+data_size]
+
+        X4 = X_test[6000:6000+data_size, 0:173]
+        y4 = y_test[6000:6000+data_size]
+        
+
+        X_test = np.concatenate((X1, X2, X3, X4))
+        y_test = np.concatenate((y1, y2, y3, y4))
+ 
+
+
+
+ 
         write_to_csv_part4("\n\n FOLD: " + str(j))
         print_and_write4("\n\n FOLD: " + str(j))
+
+        best = 0
+        best_acc = 0
 
         # A) LINEAR
 
         print_and_write4("\n\nLinear SVC")
-
+        
         clf = SVC(kernel='linear')
         clf.fit(X_train, y_train)
 
@@ -639,8 +705,8 @@ def class34( filename, i ):
         print_and_write4("SVC Linear recall")
         print_and_write4(recall_1)
 
-        write_to_csv(1, accuracy_1, recall_1, precision_1, confusion_1)
-
+        write_to_csv_4(1, accuracy_1, recall_1, precision_1, confusion_1)
+        
         # B) RADIAL
 
         print_and_write4("\n\nRadial SVC")
@@ -681,7 +747,7 @@ def class34( filename, i ):
         print_and_write4(recall_2)
 
 
-        write_to_csv(2, accuracy_2, recall_2, precision_2, confusion_2)
+        write_to_csv_4(2, accuracy_2, recall_2, precision_2, confusion_2)
 
         # C) RandomForestClassifier
 
@@ -724,7 +790,7 @@ def class34( filename, i ):
         print_and_write4(recall_3)
 
 
-        write_to_csv(3, accuracy_3, recall_3, precision_3, confusion_3)
+        write_to_csv_4(3, accuracy_3, recall_3, precision_3, confusion_3)
 
 
         # D) MLPClassifier
@@ -766,7 +832,7 @@ def class34( filename, i ):
         print_and_write4(recall_4)
 
 
-        write_to_csv(4, accuracy_4, recall_4, precision_4, confusion_4)
+        write_to_csv_4(4, accuracy_4, recall_4, precision_4, confusion_4)
 
 
         # E) AdaBoostClassifier
@@ -809,7 +875,7 @@ def class34( filename, i ):
         print_and_write4(recall_5)
 
 
-        write_to_csv(5, accuracy_5, recall_5, precision_5, confusion_5)
+        write_to_csv_4(5, accuracy_5, recall_5, precision_5, confusion_5)
 
 
 
@@ -824,17 +890,22 @@ def class34( filename, i ):
 if __name__ == "__main__":
 
     # TODO : complete each classification experiment, in sequence.
-    
-
-    # 3.1
-    #class31(args.input)
-    
-
-    # 3.2
-    
-    iBest = 1
+   
+   
     data_array = np.load(args.input)
+    
+    iBest = 4 
     '''
+    # 3.1
+    X_train, X_test, y_train, y_test, iBest = class31(args.input)
+   ''' 
+
+
+    iBest = 4 
+    
+    # 3.2
+        
+    
     for data_use in [250, 1250, 2500, 3750, 5000]:
         X1 = data_array[0:data_use, 0:173]
         y1 = data_array[0:data_use, 173]
@@ -870,15 +941,14 @@ if __name__ == "__main__":
         y_test = np.concatenate((y1, y2, y3, y4))
 
         class32(X_train, X_test, y_train, y_test, iBest)
-    '''
+    
 
-
+    
      # 3.3
-    ''' 
+    
     X = data_array[:, 0:173]
     y = data_array[:, 173]
 
-    j = 1
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42)
@@ -963,7 +1033,9 @@ if __name__ == "__main__":
         X_2k_best, y_2k, test_size=0.5, random_state=42)
 
 
-    class33(X_train_1, X_test_1, y_train_1, y_test_1, j, X_1k_train, X_1k_test, y_1k_train, y_1k_test)
-    '''
-
-    class34(args.input, 1)
+    class33(X_train_1, X_test_1, y_train_1, y_test_1, iBest, X_1k_train, X_1k_test, y_1k_train, y_1k_test)
+    
+    # class34
+    
+    class34(args.input, iBest)
+    
