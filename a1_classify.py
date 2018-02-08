@@ -20,11 +20,11 @@ parser.add_argument("-i", "--input", help="the input npz file from Task 2", requ
 parser.add_argument("--csv_out", default="garb.txt")
 parser.add_argument("--result_out", default="garb.txt")
 parser.add_argument("--data_size", type=int, default=10000)
-parser.add_argument("--csv_3_1", default="a1_3.1.csv")
-parser.add_argument("--csv_3_2", default="a1_3.2.csv")
-parser.add_argument("--csv_3_3", default="a1_3.3.csv")
+parser.add_argument("--csv_3_1", default="ext.csv")
+parser.add_argument("--csv_3_2", default="ext.csv")
+parser.add_argument("--csv_3_3", default="ext.csv")
 parser.add_argument("--part4_out", default="part4_out.txt")
-parser.add_argument("--part4_csv", default="a1_3.4.csv")
+parser.add_argument("--part4_csv", default="ext.csv")
 args = parser.parse_args()
 
 
@@ -619,7 +619,7 @@ def class34( filename, i ):
         #X_train = X_train[0:4000]
         #y_train = y_train[0:4000]
 
-        data_size=25
+        data_size=6000
 
         print(X_train.shape)
 
@@ -641,7 +641,7 @@ def class34( filename, i ):
 
 
 
-        data_size = 200
+        data_size = 2000
 
         X1 = X_test[0:data_size, 0:173]
         y1 = y_test[0:data_size]
@@ -680,9 +680,9 @@ def class34( filename, i ):
         classifications = []
         true_class = []
 
+        pred_classes = clf.predict(X_test)
         print_and_write4("Linear test data...")
-        for i, x_test in enumerate(X_test):
-            pred_class = clf.predict(x_test.reshape(1, -1))
+        for i, pred_class in enumerate(pred_classes):
             classifications.append(pred_class)
             true_class.append(y_test[i])
 
@@ -720,8 +720,7 @@ def class34( filename, i ):
 
 
         print_and_write4("Radial test data...")
-        for i, x_test in enumerate(X_test):
-            pred_class = clf.predict(x_test.reshape(1, -1))
+        for i, pred_class in enumerate(clf.predict(X_test)):
             classifications.append(pred_class)
             true_class.append(y_test[i])
 
@@ -763,8 +762,7 @@ def class34( filename, i ):
 
 
         print_and_write4("RFC test data...")
-        for i, x_test in enumerate(X_test):
-            pred_class = clf.predict(x_test.reshape(1, -1))
+        for i, pred_class in enumerate(clf.predict(X_test)):
             classifications.append(pred_class)
             true_class.append(y_test[i])
 
@@ -805,8 +803,7 @@ def class34( filename, i ):
         true_class = []
 
         print_and_write4("MLP test data...")
-        for i, x_test in enumerate(X_test):
-            pred_class = clf.predict(x_test.reshape(1, -1))
+        for i, pred_class in enumerate(clf.predict(X_test)):
             classifications.append(pred_class)
             true_class.append(y_test[i])
 
@@ -848,8 +845,7 @@ def class34( filename, i ):
 
 
         print_and_write4("ABC test data...")
-        for i, x_test in enumerate(X_test):
-            pred_class = clf.predict(x_test.reshape(1, -1))
+        for i, pred_class in enumerate(clf.predict(X_test)):
             classifications.append(pred_class)
             true_class.append(y_test[i])
 
@@ -894,18 +890,18 @@ if __name__ == "__main__":
    
     data_array = np.load(args.input)
     
-    iBest = 4 
-    '''
+    iBest = 5
+    
     # 3.1
+    '''
     X_train, X_test, y_train, y_test, iBest = class31(args.input)
-   ''' 
+    '''
 
-
-    iBest = 4 
+    
+    iBest = 5 
     
     # 3.2
-        
-    
+    '''
     for data_use in [250, 1250, 2500, 3750, 5000]:
         X1 = data_array[0:data_use, 0:173]
         y1 = data_array[0:data_use, 173]
@@ -924,28 +920,27 @@ if __name__ == "__main__":
 
         X_train = np.concatenate((X1, X2, X3, X4))
         y_train = np.concatenate((y1, y2, y3, y4))
+        X1 = data_array[data_use:data_use+3000, 0:173]
+        y1 = data_array[data_use:data_use+3000, 173]
 
-        X1 = data_array[data_use:10000, 0:173]
-        y1 = data_array[data_use:20000, 173]
+        X2 = data_array[10000+data_use:13000+data_use, 0:173]
+        y2 = data_array[10000+data_use:13000+data_use, 173]
 
-        X2 = data_array[10000+data_use:20000, 0:173]
-        y2 = data_array[10000+data_use:20000, 173]
+        X3 = data_array[20000+data_use:23000+data_use, 0:173]
+        y3 = data_array[20000+data_use:23000+data_use, 173]
 
-        X3 = data_array[20000+data_use:30000, 0:173]
-        y3 = data_array[20000+data_use:30000, 173]
-
-        X4 = data_array[30000+data_use:40000, 0:173]
-        y4 = data_array[30000+data_use:40000, 173]
+        X4 = data_array[30000+data_use:33000+data_use, 0:173]
+        y4 = data_array[30000+data_use:33000+data_use, 173]
 
         X_test = np.concatenate((X1, X2, X3, X4))
         y_test = np.concatenate((y1, y2, y3, y4))
-
         class32(X_train, X_test, y_train, y_test, iBest)
     
 
     
+    ''' 
      # 3.3
-    
+    '''    
     X = data_array[:, 0:173]
     y = data_array[:, 173]
 
@@ -980,20 +975,54 @@ if __name__ == "__main__":
         selector = SelectKBest(f_classif, k=top_k)
         X_new = selector.fit_transform(X_train, y_train)
         pp = selector.pvalues_
+        scores = selector.scores_
+        supp = selector.get_support(indices=True)
 
-        csv_3_3.write("32k " + str(top_k) + ",")
+        csv_3_3.write("32k PVAL " + str(top_k) + ", ")
         for i in pp:
-            csv_3_3.write(str(i) + ",")
+            csv_3_3.write(str(i) + ", ")
+        csv_3_3.write("\n")
+
+        csv_3_3.write("32k SCOREVAL " + str(top_k) + ", ")
+        for i in scores:
+            csv_3_3.write(str(i) + ", ")
+        csv_3_3.write("\n")
+
+        print(supp)
+        csv_3_3.write("32k SUPPORT " + str(top_k) + ", ")
+        for i in supp:
+            csv_3_3.write(str(i) + ", ")
         csv_3_3.write("\n")
 
         selector = SelectKBest(f_classif, k=top_k)
         X_new = selector.fit_transform(X_1k, y_1k)
         pp = selector.pvalues_
+        scores = selector.scores_
+        supp = selector.get_support(indices=True)
 
-        csv_3_3.write("1k " + str(top_k) + ",")
+        print(supp)
+
+        csv_3_3.write("1k PVAL " + str(top_k) + ", ")
         for i in pp:
-            csv_3_3.write(str(i) + ",")
+            csv_3_3.write(str(i) + ", ")
         csv_3_3.write("\n")
+
+
+        csv_3_3.write("1k SCOREVAL " + str(top_k) + ", ")
+        for i in scores:
+            csv_3_3.write(str(i) + ", ")
+        csv_3_3.write("\n")
+
+
+        csv_3_3.write("1k SUPP " + str(top_k) + ", ")
+        for i in supp:
+            csv_3_3.write(str(i) + ", ")
+        csv_3_3.write("\n")
+
+
+
+
+
 
     data_use = 500
  
@@ -1032,10 +1061,10 @@ if __name__ == "__main__":
     X_1k_train, X_1k_test, y_1k_train, y_1k_test = train_test_split(
         X_2k_best, y_2k, test_size=0.5, random_state=42)
 
-
+    
     class33(X_train_1, X_test_1, y_train_1, y_test_1, iBest, X_1k_train, X_1k_test, y_1k_train, y_1k_test)
-    
+    ''' 
     # class34
-    
+     
     class34(args.input, iBest)
     
