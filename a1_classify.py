@@ -9,6 +9,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 from sklearn.model_selection import KFold
+from scipy import stats
 import numpy as np
 import argparse
 import sys
@@ -20,11 +21,11 @@ parser.add_argument("-i", "--input", help="the input npz file from Task 2", requ
 parser.add_argument("--csv_out", default="garb.txt")
 parser.add_argument("--result_out", default="garb.txt")
 parser.add_argument("--data_size", type=int, default=10000)
-parser.add_argument("--csv_3_1", default="ext.csv")
-parser.add_argument("--csv_3_2", default="ext.csv")
-parser.add_argument("--csv_3_3", default="ext.csv")
+parser.add_argument("--csv_3_1", default="a1_3.1.csv")
+parser.add_argument("--csv_3_2", default="a1_3.2.csv")
+parser.add_argument("--csv_3_3", default="a1_3.3.csv")
 parser.add_argument("--part4_out", default="part4_out.txt")
-parser.add_argument("--part4_csv", default="ext.csv")
+parser.add_argument("--part4_csv", default="a1_3.4.csv")
 parser.add_argument("--compare_part_4", default="a1_3.4.csv")
 args = parser.parse_args()
 
@@ -894,13 +895,12 @@ if __name__ == "__main__":
     iBest = 5
     
     # 3.1
-    '''
+    
     X_train, X_test, y_train, y_test, iBest = class31(args.input)
-    '''
-
+    
     
     # 3.2
-    '''
+    
     for data_use in [250, 1250, 2500, 3750, 5000]:
         X1 = data_array[0:data_use, 0:173]
         y1 = data_array[0:data_use, 173]
@@ -937,9 +937,9 @@ if __name__ == "__main__":
     
 
     
-    ''' 
+     
      # 3.3
-    '''        
+            
     X = data_array[:, 0:173]
     y = data_array[:, 173]
 
@@ -1073,11 +1073,21 @@ if __name__ == "__main__":
 
     
     class33(X_train_1, X_test_1, y_train_1, y_test_1, iBest, X_1k_train, X_1k_test, y_1k_train, y_1k_test)
-    '''
+    
     # class34
-    '''    
+        
+
     class34(args.input, iBest)
     '''
-    3_4_array = np.loadtxt(args.compare_part_4)
-    print(3_4_array)    
-    
+    array_3_4 = np.loadtxt(args.compare_part_4)
+    print(array_3_4)
+    array_3_4 = np.reshape(array_3_4, (5, 5)).T
+    print(array_3_4)
+    best_array = array_3_4[4]
+    others_array = array_3_4[0:4]
+    print(best_array)
+    print(others_array)
+    for classifier_array in others_array:
+        print(stats.ttest_rel(best_array, classifier_array))
+        #write_to_csv_part4(stats.ttest_rel(best_array, classifier_array))
+   '''
