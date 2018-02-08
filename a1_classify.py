@@ -25,6 +25,7 @@ parser.add_argument("--csv_3_2", default="ext.csv")
 parser.add_argument("--csv_3_3", default="ext.csv")
 parser.add_argument("--part4_out", default="part4_out.txt")
 parser.add_argument("--part4_csv", default="ext.csv")
+parser.add_argument("--compare_part_4", default="a1_3.4.csv")
 args = parser.parse_args()
 
 
@@ -898,8 +899,6 @@ if __name__ == "__main__":
     '''
 
     
-    iBest = 5 
-    
     # 3.2
     '''
     for data_use in [250, 1250, 2500, 3750, 5000]:
@@ -940,7 +939,7 @@ if __name__ == "__main__":
     
     ''' 
      # 3.3
-    '''    
+    '''        
     X = data_array[:, 0:173]
     y = data_array[:, 173]
 
@@ -978,20 +977,25 @@ if __name__ == "__main__":
         scores = selector.scores_
         supp = selector.get_support(indices=True)
 
-        csv_3_3.write("32k PVAL " + str(top_k) + ", ")
-        for i in pp:
-            csv_3_3.write(str(i) + ", ")
-        csv_3_3.write("\n")
+        #csv_3_3.write("32k PVAL " + str(top_k) + ", ")
+        #for i in pp:
+        #    csv_3_3.write(str(i) + ", ")
+        #csv_3_3.write("\n")
 
-        csv_3_3.write("32k SCOREVAL " + str(top_k) + ", ")
-        for i in scores:
-            csv_3_3.write(str(i) + ", ")
-        csv_3_3.write("\n")
+        #csv_3_3.write("32k SCOREVAL " + str(top_k) + ", ")
+        #for i in scores:
+        #    csv_3_3.write(str(i) + ", ")
+        #csv_3_3.write("\n")
 
         print(supp)
         csv_3_3.write("32k SUPPORT " + str(top_k) + ", ")
         for i in supp:
             csv_3_3.write(str(i) + ", ")
+        csv_3_3.write("\n")
+
+        csv_3_3.write("32k SUPPORT ASSOC P VALS " + str(top_k) + ", ")
+        for i in supp:
+            csv_3_3.write(str(pp[i]) + ",");
         csv_3_3.write("\n")
 
         selector = SelectKBest(f_classif, k=top_k)
@@ -1002,22 +1006,28 @@ if __name__ == "__main__":
 
         print(supp)
 
-        csv_3_3.write("1k PVAL " + str(top_k) + ", ")
-        for i in pp:
-            csv_3_3.write(str(i) + ", ")
-        csv_3_3.write("\n")
+        #csv_3_3.write("1k PVAL " + str(top_k) + ", ")
+        #for i in pp:
+        #    csv_3_3.write(str(i) + ", ")
+        #csv_3_3.write("\n")
 
 
-        csv_3_3.write("1k SCOREVAL " + str(top_k) + ", ")
-        for i in scores:
-            csv_3_3.write(str(i) + ", ")
-        csv_3_3.write("\n")
+        #csv_3_3.write("1k SCOREVAL " + str(top_k) + ", ")
+        #for i in scores:
+        #    csv_3_3.write(str(i) + ", ")
+        #csv_3_3.write("\n")
 
 
         csv_3_3.write("1k SUPP " + str(top_k) + ", ")
         for i in supp:
             csv_3_3.write(str(i) + ", ")
         csv_3_3.write("\n")
+
+        csv_3_3.write("1k SUPPORT ASSOC P VALS " + str(top_k) + ", ")
+        for i in supp:
+            csv_3_3.write(str(pp[i]) + ",");
+        csv_3_3.write("\n")
+
 
 
 
@@ -1063,8 +1073,11 @@ if __name__ == "__main__":
 
     
     class33(X_train_1, X_test_1, y_train_1, y_test_1, iBest, X_1k_train, X_1k_test, y_1k_train, y_1k_test)
-    ''' 
+    '''
     # class34
-     
+    '''    
     class34(args.input, iBest)
+    '''
+    3_4_array = np.loadtxt(args.compare_part_4)
+    print(3_4_array)    
     

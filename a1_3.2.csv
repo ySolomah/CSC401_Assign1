@@ -1,1 +1,2 @@
-0.3874166666666667,0.4573333333333333,0.46175,0.4646666666666667,0.46908333333333335,
+0.3874166666666667,0.4573333333333333,0.46175,0.4646666666666667,0.46908333333333335
+Not surprisingly, with more data, the classifier improves. This is most likely due to encompassing a more realistic representation of the corpa. In the 1k set, the variance of training data as an estimator of the underlying corpa is too large. Therefore, at inference time, it fails to encompass features that may not have been seen during training. Having done other machine learning (for work and academia), I claim that test error decreases with increased amounts of training data. 
